@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>歴史年号暗記</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sky: #e0f4ff;
+  --sky2: #c2e8ff;
+  --blue: #2196f3;
+  --blue-dark: #1565c0;
+  --blue-mid: #42a5f5;
+  --blue-light: #90caf9;
+  --blue-pale: #e3f2fd;
+  --cyan: #00bcd4;
+  --cyan-dark: #00838f;
+  --white: #fff;
+  --gray: #78909c;
+  --gray-light: #eceff1;
+  --text: #1a2a3a;
+  --text2: #37474f;
+  --red: #f44336;
+  --red-pale: #ffebee;
+  --green: #43a047;
+  --green-pale: #e8f5e9;
+  --amber: #ffa726;
+  --amber-pale: #fff8e1;
+  --shadow: 0 4px 20px rgba(33,150,243,0.12);
+  --shadow-lg: 0 8px 32px rgba(33,150,243,0.18);
+  --r: 14px;
+  --r-sm: 8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--sky);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 10%,rgba(33,150,243,0.1) 0%,transparent 50%),radial-gradient(ellipse at 80% 90%,rgba(0,188,212,0.1) 0%,transparent 50%);pointer-events:none;z-index:0;}
+
+/* ── スクリーン共通 ── */
+.screen{display:none;position:relative;z-index:1;}
+.screen.active{display:block;animation:fadeIn 0.3s ease;}
+#screen-title.active,#screen-explain.active,#screen-gameover.active,#screen-clear.active,#screen-game.active,#screen-sort.active{display:flex;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ タイトル ══ */
+#screen-title{min-height:100vh;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;}
+.title-main{font-family:'Zen Maru Gothic',sans-serif;font-size:clamp(40px,9vw,84px);font-weight:900;background:linear-gradient(135deg,var(--blue-dark),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:4px;line-height:1.1;margin-bottom:10px;}
+.title-sub{font-size:12px;color:var(--gray);letter-spacing:4px;margin-bottom:56px;}
+.btn-start{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;border:none;border-radius:50px;padding:18px 64px;font-size:18px;font-family:'Zen Maru Gothic',sans-serif;font-weight:900;cursor:pointer;box-shadow:0 6px 24px rgba(33,150,243,0.35);transition:all 0.2s;letter-spacing:3px;}
+.btn-start:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(33,150,243,0.45);}
+.btn-start:active{transform:translateY(1px);}
+
+/* ══ 条件画面 ══ */
+#screen-filter{min-height:100vh;background:var(--sky);}
+.filter-layout{display:flex;flex-direction:column;height:100vh;}
+.filter-topbar{background:linear-gradient(135deg,var(--blue-dark),var(--blue));padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,0.15);}
+.filter-topbar-title{font-family:'Zen Maru Gothic',sans-serif;font-size:18px;font-weight:900;color:#fff;letter-spacing:2px;flex:1;}
+.filter-body{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:8px;}
+.filter-card{background:#fff;border-radius:var(--r);padding:8px 10px;box-shadow:var(--shadow);}
+.filter-label{font-size:11px;font-weight:700;color:var(--gray);margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;letter-spacing:1px;}
+.sel-all-btn{font-size:11px;background:var(--blue-pale);color:var(--blue);border:none;border-radius:20px;padding:3px 10px;cursor:pointer;font-weight:700;}
+.sel-all-btn:hover{background:var(--blue);color:#fff;}
+.clr-btn{font-size:11px;color:#aaa;background:none;border:1.5px dashed #ccc;border-radius:20px;padding:3px 10px;cursor:pointer;}
+.clr-btn:hover{color:var(--red);border-color:var(--red);}
+.tags{display:flex;flex-wrap:wrap;gap:5px;}
+.tag{padding:4px 11px;border-radius:50px;border:1.5px solid #ccc;background:var(--gray-light);font-size:12px;font-weight:700;cursor:pointer;color:var(--text2);user-select:none;transition:all 0.15s;}
+.tag:hover{border-color:var(--blue);}
+.tag.selected{background:var(--blue);border-color:var(--blue);color:#fff;}
+.tag.subject-jp.selected{background:#e53935;border-color:#e53935;}
+.tag.subject-world.selected{background:#1e88e5;border-color:#1e88e5;}
+.opt-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.opt-btn{padding:5px 14px;border-radius:50px;border:1.5px solid #ccc;background:var(--gray-light);font-size:12px;font-weight:700;cursor:pointer;color:var(--text2);transition:all 0.15s;}
+.opt-btn.selected{background:var(--blue);border-color:var(--blue);color:#fff;}
+.opt-btn.life.selected{background:var(--red);border-color:var(--red);color:#fff;}
+.custom-input{width:68px;padding:5px 10px;border:2px solid #ccc;border-radius:8px;font-size:13px;background:#fff;color:var(--text);display:none;}
+.custom-input.visible{display:inline-block;}
+.custom-input:focus{outline:none;border-color:var(--blue);}
+.mode-row{display:flex;gap:10px;}
+.mode-card{flex:1;padding:10px 8px;border-radius:var(--r);border:1.5px solid #ccc;background:var(--gray-light);cursor:pointer;text-align:center;transition:all 0.15s;}
+.mode-card.selected{border-color:var(--blue);background:var(--blue-pale);box-shadow:0 0 0 3px rgba(33,150,243,0.15);}
+.mode-card .mode-name{font-weight:700;font-size:13px;color:var(--text);}
+.mode-card .mode-desc{font-size:11px;color:var(--gray);margin-top:4px;}
+.filter-footer{background:#fff;border-top:1px solid rgba(0,0,0,0.08);padding:10px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0;box-shadow:0 -4px 16px rgba(0,0,0,0.06);}
+.count-badge{background:var(--blue-pale);border:1px solid var(--blue-light);border-radius:50px;padding:6px 14px;font-size:13px;font-weight:700;color:var(--blue-dark);margin-left:auto;}
+.count-badge span{color:var(--cyan-dark);font-size:18px;font-weight:900;}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;border:none;border-radius:50px;padding:10px 26px;font-size:14px;font-family:'Noto Sans JP',sans-serif;font-weight:700;cursor:pointer;box-shadow:0 4px 16px rgba(33,150,243,0.3);transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-primary:hover{transform:translateY(-1px);}
+.btn-primary:disabled{background:#ccc;box-shadow:none;cursor:not-allowed;transform:none;}
+.btn-list{background:#fff;color:var(--blue-dark);border:2px solid var(--blue);border-radius:50px;padding:9px 20px;font-size:14px;font-family:'Noto Sans JP',sans-serif;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-list:hover{background:var(--blue-pale);transform:translateY(-1px);}
+.btn-iqq{background:#fff;color:#e65100;border:2px solid #ff9448;border-radius:50px;padding:9px 20px;font-size:14px;font-family:'Noto Sans JP',sans-serif;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px;}
+.btn-iqq:hover{background:#fff5ee;transform:translateY(-1px);}
+.btn-secondary{background:#fff;color:var(--gray);border:2px solid #ccc;border-radius:50px;padding:9px 18px;font-size:13px;font-family:'Noto Sans JP',sans-serif;font-weight:700;cursor:pointer;transition:all 0.15s;}
+.btn-secondary:hover{border-color:var(--blue);color:var(--blue-dark);}
+
+/* ══ モーダル ══ */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.active{display:flex;}
+.modal-box{background:#fff;border-radius:var(--r);padding:24px;max-width:680px;width:92%;max-height:80vh;overflow-y:auto;box-shadow:var(--shadow-lg);}
+.modal-title{font-weight:900;font-size:18px;color:var(--blue-dark);margin-bottom:14px;}
+/* 年表形式モーダル */
+.timeline-list{display:flex;flex-direction:column;gap:0;}
+.timeline-item{display:flex;align-items:stretch;border-bottom:1px solid rgba(33,150,243,0.12);}
+.timeline-item:last-child{border-bottom:none;}
+.timeline-year{
+  min-width:90px;
+  padding:10px 12px;
+  font-family:'Zen Maru Gothic',sans-serif;
+  font-size:13px;font-weight:900;
+  color:var(--blue-dark);
+  background:var(--blue-pale);
+  display:flex;align-items:center;justify-content:flex-end;
+  border-right:3px solid var(--blue);
+  flex-shrink:0;
+  letter-spacing:0.5px;
+}
+.timeline-body{
+  padding:10px 14px;
+  flex:1;
+  display:flex;flex-direction:column;justify-content:center;gap:4px;
+}
+.timeline-event{font-size:13px;font-weight:700;color:var(--text);line-height:1.4;}
+.timeline-tags{display:flex;flex-wrap:wrap;gap:3px;}
+.timeline-tag{font-size:10px;background:#fff;border:1px solid #ccc;border-radius:20px;padding:1px 7px;color:var(--gray);}
+
+/* ══ ゲーム画面（通常） ══ */
+#screen-game{min-height:100vh;flex-direction:column;align-items:stretch;background:linear-gradient(180deg,#f0f8ff 0%,#e3f2fd 60%,#dceefb 100%);}
+
+/* 上部進捗バー */
+.game-top-bar{background:rgba(33,150,243,0.08);border-bottom:1px solid rgba(33,150,243,0.15);display:flex;align-items:stretch;min-height:32px;flex-shrink:0;overflow:hidden;}
+.progress-cell{flex:1;border-right:1px solid rgba(33,150,243,0.15);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:rgba(33,150,243,0.35);min-width:0;}
+.progress-cell.done{background:rgba(33,150,243,0.18);color:#1565c0;}
+.progress-cell.current{background:var(--blue);color:#fff;}
+
+/* HUD */
+.game-hud{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;flex-shrink:0;}
+.hud-back-btn{background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.5);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;font-family:'Noto Sans JP',sans-serif;color:#fff;cursor:pointer;letter-spacing:1px;transition:all 0.15s;}
+.hud-back-btn:hover{background:rgba(255,255,255,0.25);}
+.hud-mode-label{background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.5);border-radius:8px;padding:5px 18px;font-size:12px;font-weight:700;color:#fff;letter-spacing:2px;}
+.hud-lives{display:flex;align-items:center;gap:6px;}
+.heart-icon{width:26px;height:26px;background:#ef5350;border-radius:50%;border:2px solid rgba(255,255,255,0.8);display:flex;align-items:center;justify-content:center;font-size:13px;transition:all 0.3s;}
+.heart-icon.lost{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.2);}
+.lives-count{font-size:13px;font-weight:700;color:#37474f;}
+
+/* 中央エリア */
+.game-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 20px;position:relative;}
+
+/* タイマー */
+.timer-wrap{margin-bottom:16px;}
+.timer-ring{position:relative;width:80px;height:80px;}
+.timer-ring svg{transform:rotate(-90deg);}
+.timer-ring circle{fill:none;stroke-width:6;stroke-linecap:round;}
+.timer-bg{stroke:rgba(33,150,243,0.15);}
+.timer-fg{stroke:var(--blue);transition:stroke-dashoffset 1s linear,stroke 0.5s;}
+.timer-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Zen Maru Gothic',sans-serif;font-size:26px;font-weight:900;color:#1565c0;}
+
+/* 問題カード */
+.q-card{background:#fff;border-radius:20px;border:1.5px solid rgba(33,150,243,0.2);padding:32px 48px;text-align:center;box-shadow:0 4px 24px rgba(33,150,243,0.1);max-width:600px;width:100%;margin-bottom:24px;}
+.q-num-label{font-size:11px;font-weight:700;color:#90a4ae;letter-spacing:3px;margin-bottom:10px;}
+.q-body{font-family:'Zen Maru Gothic',sans-serif;font-size:clamp(22px,5vw,40px);font-weight:900;color:#1a2a3a;letter-spacing:2px;line-height:1.3;margin-bottom:8px;}
+.q-hint-label{font-size:12px;color:#90a4ae;letter-spacing:1px;}
+
+/* 入力エリア */
+.game-input-area{background:rgba(33,150,243,0.06);border-top:1px solid rgba(33,150,243,0.15);padding:16px 20px 28px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.input-row{display:flex;gap:10px;width:100%;max-width:440px;}
+.ans-input{flex:1;padding:14px 20px;border:2.5px solid rgba(255,255,255,0.4);border-radius:50px;font-size:24px;font-family:'Zen Maru Gothic',sans-serif;font-weight:900;text-align:center;color:var(--text);background:rgba(255,255,255,0.96);outline:none;transition:all 0.2s;}
+.ans-input:focus{border-color:#fff176;box-shadow:0 0 0 4px rgba(255,241,118,0.3);}
+.ans-input.correct{background:#e8f5e9;border-color:#66bb6a;animation:correct-pop 0.5s;}
+.ans-input.wrong{border-color:#ef5350;background:#ffebee;animation:shake 0.4s;}
+.ans-input.near{background:#fff8e1;border-color:#ffa726;}
+@keyframes correct-pop{0%,100%{transform:scale(1)}40%{transform:scale(1.06)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+.btn-answer{background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;border:none;border-radius:50px;padding:14px 28px;font-size:15px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;box-shadow:0 4px 12px rgba(33,150,243,0.3);transition:all 0.15s;white-space:nowrap;}
+.btn-answer:hover{transform:translateY(-1px);}
+.input-hint-text{font-size:11px;color:#90a4ae;letter-spacing:1px;}
+
+/* 正解フラッシュオーバーレイ */
+.result-flash{position:fixed;inset:0;pointer-events:none;z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.15s;}
+.result-flash.show{opacity:1;}
+.result-flash.correct-flash{background:rgba(76,175,80,0.25);}
+.result-flash.wrong-flash{background:rgba(244,67,54,0.25);}
+.result-flash.time-flash{background:rgba(156,39,176,0.25);}
+.flash-label{font-family:'Zen Maru Gothic',sans-serif;font-size:clamp(48px,10vw,96px);font-weight:900;color:#fff;text-shadow:0 4px 20px rgba(0,0,0,0.3);animation:flash-pop 0.4s ease;}
+@keyframes flash-pop{0%{transform:scale(0.5);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+
+/* ══ 解説画面 ══ */
+#screen-explain{min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;gap:16px;}
+.explain-bg-correct{background:linear-gradient(160deg,#1b5e20,#2e7d32);}
+.explain-bg-wrong{background:linear-gradient(160deg,#b71c1c,#c62828);}
+.explain-bg-near{background:linear-gradient(160deg,#e65100,#ef6c00);}
+.explain-bg-time{background:linear-gradient(160deg,#4a148c,#6a1b9a);}
+
+/* カード本体 */
+.explain-card{
+  background:#fff;border-radius:18px;
+  padding:28px 28px 24px;
+  max-width:480px;width:100%;
+  box-shadow:0 16px 48px rgba(0,0,0,0.22);
+}
+.explain-badge{
+  display:inline-block;padding:6px 24px;border-radius:50px;
+  font-size:13px;font-weight:900;margin-bottom:20px;letter-spacing:2px;
+}
+.badge-correct{background:#e8f5e9;color:#2e7d32;border:2px solid #81c784;}
+.badge-near{background:#fff8e1;color:#e65100;border:2px solid #ffb74d;}
+.badge-wrong{background:#ffebee;color:#c62828;border:2px solid #ef9a9a;}
+.badge-time{background:#f3e5f5;color:#6a1b9a;border:2px solid #ce93d8;}
+
+/* 並び替え結果：正解テーブル */
+.explain-sort-table{width:100%;border-radius:12px;overflow:hidden;border:1.5px solid #e0e0e0;margin-bottom:0;}
+.explain-sort-row{
+  display:grid;
+  grid-template-columns:28px 68px 20px 1fr;
+  align-items:center;
+  gap:0;
+  border-bottom:1px solid #f0f0f0;
+}
+.explain-sort-row:last-child{border-bottom:none;}
+.explain-sort-rank{
+  font-size:11px;font-weight:900;color:#90a4ae;
+  text-align:center;padding:10px 0;
+  background:#fafafa;
+  border-right:1px solid #f0f0f0;
+}
+.explain-sort-year{
+  font-family:'Zen Maru Gothic',sans-serif;
+  font-size:13px;font-weight:900;color:var(--blue-dark);
+  text-align:center;padding:10px 4px;
+  background:#f0f7ff;
+  border-right:1px solid #d0e8ff;
+}
+.explain-sort-arrow{
+  font-size:11px;color:#90a4ae;text-align:center;
+  padding:0;
+}
+.explain-sort-event{
+  font-size:12px;font-weight:700;color:#1a2a3a;
+  padding:10px 12px;line-height:1.4;
+}
+.explain-sort-row.correct-row .explain-sort-rank{background:#e8f5e9;color:#388e3c;}
+.explain-sort-row.wrong-row .explain-sort-rank{background:#ffebee;color:#c62828;}
+.explain-sort-row.wrong-row .explain-sort-year{background:#fff0f0;border-right-color:#ffcdd2;color:#c62828;}
+.explain-sort-row.wrong-row .explain-sort-arrow{color:#ffcdd2;}
+.explain-sort-row.wrong-row .explain-sort-event{color:#c62828;}
+
+/* あなたの解答テーブル */
+.explain-your-label{
+  font-family:'Zen Maru Gothic',sans-serif;
+  font-size:12px;font-weight:900;letter-spacing:2px;color:#1a2a3a;
+  margin:14px 0 6px;text-align:left;
+}
+.explain-your-table{width:100%;border-radius:10px;overflow:hidden;border:1.5px solid #ffe0e0;margin-bottom:0;}
+.explain-your-row{
+  display:grid;grid-template-columns:28px 1fr;
+  align-items:center;gap:0;
+  border-bottom:1px solid #fff0f0;
+}
+.explain-your-row:last-child{border-bottom:none;}
+.explain-your-rank{
+  font-size:11px;font-weight:900;
+  text-align:center;padding:9px 0;
+  background:#fff5f5;color:#90a4ae;
+  border-right:1px solid #ffe0e0;
+}
+.explain-your-event{font-size:12px;font-weight:700;color:#546e7a;padding:9px 12px;line-height:1.4;}
+.explain-your-row.wrong-pos .explain-your-rank{color:#c62828;background:#ffebee;}
+.explain-your-row.wrong-pos .explain-your-event{color:#c62828;}
+
+/* 通常モード用 */
+.explain-ans-label{font-size:10px;color:var(--gray);letter-spacing:3px;margin-bottom:6px;text-align:center;}
+.explain-ans{font-family:'Zen Maru Gothic',sans-serif;font-size:40px;font-weight:900;color:var(--blue-dark);margin-bottom:6px;text-align:center;}
+.explain-your{font-size:12px;color:var(--gray);margin-bottom:12px;text-align:center;}
+.explain-tags{display:flex;justify-content:center;flex-wrap:wrap;gap:6px;margin-top:16px;margin-bottom:0;}
+.explain-tag{font-size:11px;padding:4px 12px;border-radius:50px;background:var(--blue-pale);border:1px solid var(--blue-light);color:var(--text2);}
+
+.btn-next{
+  background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;border:none;
+  border-radius:50px;padding:14px 52px;font-size:16px;font-weight:700;
+  font-family:'Noto Sans JP',sans-serif;cursor:pointer;
+  box-shadow:0 4px 16px rgba(33,150,243,0.35);transition:all 0.2s;
+  letter-spacing:2px;margin-top:20px;display:block;width:100%;
+}
+.btn-next:hover{transform:translateY(-2px);}
+.enter-hint{font-size:11px;color:rgba(255,255,255,0.5);letter-spacing:1px;}
+
+/* ══ 並び替えモード ══ */
+#screen-sort{min-height:100vh;flex-direction:column;align-items:stretch;background:linear-gradient(160deg,#1565c0 0%,#1976d2 40%,#0288d1 100%);}
+.sort-top-bar{background:rgba(0,0,0,0.2);display:flex;align-items:stretch;min-height:32px;flex-shrink:0;overflow:hidden;}
+.sort-hud{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;flex-shrink:0;}
+.sort-hud-info{font-size:13px;font-weight:700;color:rgba(255,255,255,0.75);}
+.sort-center{flex:1;display:flex;flex-direction:column;align-items:center;padding:16px;overflow-y:auto;}
+.sort-instruction{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.25);border-radius:10px;padding:10px 20px;font-size:13px;font-weight:700;color:rgba(255,255,255,0.9);text-align:center;margin-bottom:20px;letter-spacing:1px;}
+
+/* 上段：ドロップ枠 */
+.sort-slots-row{display:flex;gap:12px;justify-content:center;margin-bottom:20px;flex-wrap:wrap;}
+.sort-slot{width:140px;min-height:90px;border-radius:12px;border:2.5px dashed rgba(255,255,255,0.4);background:rgba(255,255,255,0.08);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:all 0.2s;}
+.sort-slot .slot-num{font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:2px;position:absolute;top:6px;left:0;right:0;text-align:center;}
+.sort-slot.drag-over{border-color:#fff176;background:rgba(255,241,118,0.15);transform:scale(1.04);}
+.sort-slot.filled{border-style:solid;border-color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.15);}
+.slot-card{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px;text-align:center;cursor:grab;}
+.slot-card-text{font-family:'Zen Maru Gothic',sans-serif;font-size:13px;font-weight:900;color:#fff;line-height:1.35;}
+.slot-remove{display:none;}
+.sort-arrow{font-size:20px;color:rgba(255,255,255,0.4);display:flex;align-items:center;}
+
+/* 下段：カード群 */
+.sort-cards-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;max-width:620px;width:100%;}
+.sort-card{background:rgba(255,255,255,0.9);border-radius:10px;padding:14px 18px;font-family:'Zen Maru Gothic',sans-serif;font-size:14px;font-weight:900;color:var(--text);cursor:grab;user-select:none;touch-action:none;transition:all 0.15s;box-shadow:0 4px 12px rgba(0,0,0,0.15);min-width:120px;text-align:center;border:2.5px solid transparent;}
+.sort-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,0.2);}
+.sort-card.dragging-card{opacity:0.35;transform:scale(0.95);}
+.sort-card.used{opacity:0;pointer-events:none;}
+
+.sort-submit-area{padding:16px 20px 28px;display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0;}
+.btn-sort-submit{background:#fff176;color:#1a2a3a;border:none;border-radius:50px;padding:14px 48px;font-size:16px;font-weight:700;font-family:'Noto Sans JP',sans-serif;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,0.2);transition:all 0.2s;letter-spacing:2px;}
+.btn-sort-submit:hover{transform:translateY(-1px);}
+.btn-sort-submit:disabled{background:rgba(255,255,255,0.3);color:rgba(255,255,255,0.5);cursor:not-allowed;transform:none;}
+
+/* ══ ゲームオーバー / クリア ══ */
+#screen-gameover,#screen-clear{min-height:100vh;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;}
+#screen-gameover{background:linear-gradient(160deg,#b71c1c,#880e4f);}
+#screen-clear{background:linear-gradient(160deg,#1565c0,#00838f);}
+.result-icon{font-size:72px;margin-bottom:16px;animation:popIn 0.5s ease;}
+@keyframes popIn{0%{transform:scale(0)}80%{transform:scale(1.1)}100%{transform:scale(1)}}
+.result-title{font-family:'Zen Maru Gothic',sans-serif;font-size:48px;font-weight:900;color:#fff;margin-bottom:10px;letter-spacing:4px;text-shadow:0 4px 12px rgba(0,0,0,0.2);}
+.result-sub{font-size:14px;color:rgba(255,255,255,0.7);margin-bottom:36px;font-weight:700;letter-spacing:2px;}
+.result-stats{display:flex;gap:16px;justify-content:center;margin-bottom:36px;flex-wrap:wrap;}
+.stat-box{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:12px;padding:16px 28px;min-width:110px;backdrop-filter:blur(8px);}
+.stat-num{font-family:'Zen Maru Gothic',sans-serif;font-size:32px;font-weight:900;color:#fff176;}
+.stat-label{font-size:11px;color:rgba(255,255,255,0.6);margin-top:4px;letter-spacing:2px;}
+.result-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:rgba(0,0,0,0.05);}
+::-webkit-scrollbar-thumb{background:#b0bec5;border-radius:3px;}
+@media(max-width:600px){
+  .filter-row-2col{flex-direction:column;}
+
+  /* 並び替えモード：スマホレイアウト */
+  #screen-sort{height:100vh;overflow:hidden;}
+  .sort-center{padding:8px 10px;overflow:hidden;justify-content:flex-start;gap:10px;}
+  .sort-instruction{font-size:11px;padding:6px 12px;margin-bottom:0;}
+
+  /* スロットを2×2グリッドに */
+  .sort-slots-row{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    grid-template-rows:auto auto;
+    gap:6px 4px;
+    margin-bottom:8px;
+    width:100%;
+    max-width:100%;
+  }
+  .sort-slot{width:auto;min-height:64px;font-size:11px;}
+  .sort-arrow{font-size:14px;display:flex;align-items:center;justify-content:center;}
+  /* 矢印①→②はgrid-row:1, ③→④はgrid-row:2 */
+  .sort-slots-row .sort-slot:nth-child(1){grid-column:1;grid-row:1;}
+  .sort-slots-row .sort-arrow:nth-child(2){grid-column:2;grid-row:1;}
+  .sort-slots-row .sort-slot:nth-child(3){grid-column:3;grid-row:1;}
+  .sort-slots-row .sort-arrow:nth-child(4){grid-column:1;grid-row:2;justify-self:end;font-size:12px;}
+  .sort-slots-row .sort-slot:nth-child(5){grid-column:2;grid-row:2;grid-column:2/4;}
+  /* ③と④を2行目に並べる */
+  .sort-slots-row .sort-slot:nth-child(5){grid-column:1;grid-row:2;}
+  .sort-slots-row .sort-arrow:nth-child(6){grid-column:2;grid-row:2;}
+  .sort-slots-row .sort-slot:nth-child(7){grid-column:3;grid-row:2;}
+
+  /* カードを2×2グリッドに */
+  .sort-cards-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+    width:100%;
+    max-width:100%;
+  }
+  .sort-card{
+    min-width:0;
+    padding:10px 8px;
+    font-size:12px;
+    line-height:1.35;
+    min-height:56px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .sort-submit-area{padding:10px 16px 20px;}
+  .slot-card-text{font-size:11px;}
+}
+
+/* ══ 横並びカード ══ */
+.filter-row-2col{display:flex;gap:8px;align-items:stretch;}
+.filter-row-2col .filter-card{margin-bottom:0;}
+
+/* ══ 折りたたみ ══ */
+.collapsible{overflow:hidden;transition:max-height 0.35s ease, opacity 0.3s ease;max-height:600px;opacity:1;padding-top:4px;}
+.collapsible.collapsed{max-height:0;opacity:0;padding-top:0;}
+.collapse-header{
+  display:flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,var(--blue-pale),#f0faff);
+  border:1.5px solid var(--blue-light);
+  border-radius:10px;
+  padding:8px 12px;
+  cursor:pointer;
+  user-select:none;
+  transition:all 0.15s;
+  margin-bottom:0;
+}
+.collapse-header:hover{background:linear-gradient(135deg,#d0eaff,#e8f7ff);border-color:var(--blue);}
+.collapse-header:active{transform:scale(0.98);}
+.collapse-title{font-size:12px;font-weight:700;color:var(--blue-dark);letter-spacing:1px;flex:1;}
+.collapse-hint{font-size:10px;color:var(--blue);background:rgba(33,150,243,0.1);border-radius:20px;padding:2px 8px;white-space:nowrap;}
+.collapse-hint.open-hint{display:none;}
+.collapse-arrow{font-size:11px;color:var(--blue);transition:transform 0.25s;display:inline-block;}
+.collapse-arrow.open{transform:rotate(90deg);}
+.collapse-header-btns{display:flex;gap:4px;margin-left:4px;}
+</style>
+</head>
+<body>
+
+<!-- フラッシュオーバーレイ -->
+<div class="result-flash" id="result-flash">
+  <div class="flash-label" id="flash-label"></div>
+</div>
+
+<!-- ══ タイトル ══ -->
+<div id="screen-title" class="screen active">
+  <div class="title-main">歴史年号暗記</div>
+  <div class="title-sub">HISTORY DATE MASTER</div>
+  <button class="btn-start" onclick="gotoFilter()">はじめる</button>
+</div>
+
+<!-- ══ 条件画面 ══ -->
+<div id="screen-filter" class="screen">
+  <div class="filter-layout">
+    <div class="filter-topbar">
+      <button class="btn-secondary" onclick="showScreen('screen-title')" style="padding:6px 14px;font-size:12px;">← 戻る</button>
+      <div class="filter-topbar-title">出題条件を絞り込む</div>
+    </div>
+    <div class="filter-body">
+      <!-- モード -->
+      <div class="filter-card">
+        <div class="filter-label">モード</div>
+        <div class="mode-row">
+          <div class="mode-card selected" id="mode-sort" onclick="selectMode('sort')">
+            <div class="mode-name">並び替えモード</div>
+            <div class="mode-desc">4つの出来事を時代順に</div>
+          </div>
+          <div class="mode-card" id="mode-normal" onclick="selectMode('normal')">
+            <div class="mode-name">年号暗記モード</div>
+            <div class="mode-desc">年号を数字で入力</div>
+          </div>
+        </div>
+      </div>
+      <!-- 科目 -->
+      <div class="filter-card">
+        <div class="filter-label">科目 <button class="clr-btn" onclick="clearFilter('subject')">すべて解除</button></div>
+        <div class="tags" id="tags-subject">
+          <div class="tag subject-jp selected" data-group="subject" data-val="日本史" onclick="toggleTag(this)">日本史</div>
+          <div class="tag subject-world selected" data-group="subject" data-val="世界史" onclick="toggleTag(this)">世界史</div>
+        </div>
+      </div>
+      <!-- 時代JP・World 横並び -->
+      <div class="filter-row-2col">
+      <div class="filter-card" id="era-jp-card" style="flex:1;min-width:0;">
+        <div class="collapse-header" onclick="toggleCollapse('era-jp')">
+          <span class="collapse-arrow" id="arrow-era-jp">▶</span>
+          <span class="collapse-title">時代（日本史）</span>
+          <span class="collapse-hint" id="hint-era-jp">タップで絞り込む</span>
+        </div>
+        <div class="collapsible collapsed" id="tags-wrap-era-jp">
+          <div style="display:flex;gap:4px;padding:6px 2px 4px;">
+            <button class="sel-all-btn" onclick="selectAll('era-jp')">すべて選択</button>
+            <button class="clr-btn" onclick="clearFilter('era-jp')">解除</button>
+          </div>
+          <div class="tags" id="tags-era-jp">
+          <div class="tag selected" data-group="era-jp" data-val="旧石器" onclick="toggleTag(this)">旧石器</div>
+          <div class="tag selected" data-group="era-jp" data-val="縄文" onclick="toggleTag(this)">縄文</div>
+          <div class="tag selected" data-group="era-jp" data-val="弥生" onclick="toggleTag(this)">弥生</div>
+          <div class="tag selected" data-group="era-jp" data-val="古墳" onclick="toggleTag(this)">古墳</div>
+          <div class="tag selected" data-group="era-jp" data-val="飛鳥" onclick="toggleTag(this)">飛鳥</div>
+          <div class="tag selected" data-group="era-jp" data-val="奈良" onclick="toggleTag(this)">奈良</div>
+          <div class="tag selected" data-group="era-jp" data-val="平安" onclick="toggleTag(this)">平安</div>
+          <div class="tag selected" data-group="era-jp" data-val="鎌倉" onclick="toggleTag(this)">鎌倉</div>
+          <div class="tag selected" data-group="era-jp" data-val="室町" onclick="toggleTag(this)">室町</div>
+          <div class="tag selected" data-group="era-jp" data-val="戦国" onclick="toggleTag(this)">戦国</div>
+          <div class="tag selected" data-group="era-jp" data-val="江戸" onclick="toggleTag(this)">江戸</div>
+          <div class="tag selected" data-group="era-jp" data-val="明治" onclick="toggleTag(this)">明治</div>
+          <div class="tag selected" data-group="era-jp" data-val="大正" onclick="toggleTag(this)">大正</div>
+          <div class="tag selected" data-group="era-jp" data-val="戦前" onclick="toggleTag(this)">戦前</div>
+          <div class="tag selected" data-group="era-jp" data-val="戦後" onclick="toggleTag(this)">戦後</div>
+          <div class="tag selected" data-group="era-jp" data-val="現代" onclick="toggleTag(this)">現代</div>
+          </div>
+        </div>
+      </div>
+      <div class="filter-card" id="era-world-card" style="flex:1;min-width:0;">
+        <div class="collapse-header" onclick="toggleCollapse('era-world')">
+          <span class="collapse-arrow" id="arrow-era-world">▶</span>
+          <span class="collapse-title">時代（世界史）</span>
+          <span class="collapse-hint" id="hint-era-world">タップで絞り込む</span>
+        </div>
+        <div class="collapsible collapsed" id="tags-wrap-era-world">
+          <div style="display:flex;gap:4px;padding:6px 2px 4px;">
+            <button class="sel-all-btn" onclick="selectAll('era-world')">すべて選択</button>
+            <button class="clr-btn" onclick="clearFilter('era-world')">解除</button>
+          </div>
+          <div class="tags" id="tags-era-world">
+          <div class="tag selected" data-group="era-world" data-val="先史・石器時代" onclick="toggleTag(this)">先史・石器時代</div>
+          <div class="tag selected" data-group="era-world" data-val="古代" onclick="toggleTag(this)">古代</div>
+          <div class="tag selected" data-group="era-world" data-val="中世" onclick="toggleTag(this)">中世</div>
+          <div class="tag selected" data-group="era-world" data-val="近世" onclick="toggleTag(this)">近世</div>
+          <div class="tag selected" data-group="era-world" data-val="近代" onclick="toggleTag(this)">近代</div>
+          <div class="tag selected" data-group="era-world" data-val="現代" onclick="toggleTag(this)">現代</div>
+          </div>
+        </div>
+      </div>
+      </div><!-- /時代2col -->
+      <!-- 地域・テーマ 横並び -->
+      <div class="filter-row-2col">
+      <div class="filter-card" style="flex:1;min-width:0;">
+        <div class="collapse-header" onclick="toggleCollapse('region')">
+          <span class="collapse-arrow" id="arrow-region">▶</span>
+          <span class="collapse-title">地域</span>
+          <span class="collapse-hint" id="hint-region">タップで絞り込む</span>
+        </div>
+        <div class="collapsible collapsed" id="tags-wrap-region">
+          <div style="display:flex;gap:4px;padding:6px 2px 4px;">
+            <button class="sel-all-btn" onclick="selectAll('region')">すべて選択</button>
+            <button class="clr-btn" onclick="clearFilter('region')">解除</button>
+          </div>
+          <div class="tags" id="tags-region">
+          <div class="tag selected" data-group="region" data-val="中華王朝" onclick="toggleTag(this)">中華王朝</div>
+          <div class="tag selected" data-group="region" data-val="朝鮮半島" onclick="toggleTag(this)">朝鮮半島</div>
+          <div class="tag selected" data-group="region" data-val="東南アジア" onclick="toggleTag(this)">東南アジア</div>
+          <div class="tag selected" data-group="region" data-val="南アジア" onclick="toggleTag(this)">南アジア</div>
+          <div class="tag selected" data-group="region" data-val="西アジア" onclick="toggleTag(this)">西アジア</div>
+          <div class="tag selected" data-group="region" data-val="中央ユーラシア" onclick="toggleTag(this)">中央ユーラシア</div>
+          <div class="tag selected" data-group="region" data-val="地中海沿岸" onclick="toggleTag(this)">地中海沿岸</div>
+          <div class="tag selected" data-group="region" data-val="イスラム圏" onclick="toggleTag(this)">イスラム圏</div>
+          <div class="tag selected" data-group="region" data-val="ヨーロッパ" onclick="toggleTag(this)">ヨーロッパ</div>
+          <div class="tag selected" data-group="region" data-val="フランス" onclick="toggleTag(this)">フランス</div>
+          <div class="tag selected" data-group="region" data-val="イギリス" onclick="toggleTag(this)">イギリス</div>
+          <div class="tag selected" data-group="region" data-val="ドイツ" onclick="toggleTag(this)">ドイツ</div>
+          <div class="tag selected" data-group="region" data-val="ロシア" onclick="toggleTag(this)">ロシア</div>
+          <div class="tag selected" data-group="region" data-val="アフリカ" onclick="toggleTag(this)">アフリカ</div>
+          <div class="tag selected" data-group="region" data-val="アメリカ" onclick="toggleTag(this)">アメリカ</div>
+          <div class="tag selected" data-group="region" data-val="ラテン・南アメリカ" onclick="toggleTag(this)">ラテン・南アメリカ</div>
+          <div class="tag selected" data-group="region" data-val="日本" onclick="toggleTag(this)">日本</div>
+          </div>
+        </div>
+      </div>
+      <div class="filter-card" style="flex:1;min-width:0;">
+        <div class="collapse-header" onclick="toggleCollapse('theme')">
+          <span class="collapse-arrow" id="arrow-theme">▶</span>
+          <span class="collapse-title">テーマ</span>
+          <span class="collapse-hint" id="hint-theme">タップで絞り込む</span>
+        </div>
+        <div class="collapsible collapsed" id="tags-wrap-theme">
+          <div style="display:flex;gap:4px;padding:6px 2px 4px;">
+            <button class="sel-all-btn" onclick="selectAll('theme')">すべて選択</button>
+            <button class="clr-btn" onclick="clearFilter('theme')">解除</button>
+          </div>
+          <div class="tags" id="tags-theme">
+          <div class="tag selected" data-group="theme" data-val="戦争" onclick="toggleTag(this)">戦争</div>
+          <div class="tag selected" data-group="theme" data-val="文化" onclick="toggleTag(this)">文化</div>
+          <div class="tag selected" data-group="theme" data-val="国家" onclick="toggleTag(this)">国家</div>
+          <div class="tag selected" data-group="theme" data-val="政策" onclick="toggleTag(this)">政策</div>
+          <div class="tag selected" data-group="theme" data-val="その他" onclick="toggleTag(this)">その他</div>
+          </div>
+        </div>
+      </div>
+      </div><!-- /地域テーマ2col -->
+      <!-- 出題数 -->
+      <div class="filter-card">
+        <div class="filter-label">出題数</div>
+        <div class="opt-row" id="count-options">
+          <button class="opt-btn selected" data-val="7" onclick="selectCount(this)">7問</button>
+          <button class="opt-btn" data-val="10" onclick="selectCount(this)">10問</button>
+          <button class="opt-btn" data-val="15" onclick="selectCount(this)">15問</button>
+          <button class="opt-btn" data-val="25" onclick="selectCount(this)">25問</button>
+          <button class="opt-btn" data-val="custom" onclick="selectCount(this)">自由入力</button>
+          <button class="opt-btn" data-val="all" onclick="selectCount(this)">すべて</button>
+          <input type="number" id="custom-count" class="custom-input" min="1" max="9999" value="20" placeholder="問数">
+        </div>
+      </div>
+      <!-- ライフ -->
+      <div class="filter-card" id="life-card">
+        <div class="filter-label">ライフ</div>
+        <div class="opt-row">
+          <button class="opt-btn life" data-val="1" onclick="selectLife(this)">1</button>
+          <button class="opt-btn life selected" data-val="3" onclick="selectLife(this)">3</button>
+          <button class="opt-btn life" data-val="5" onclick="selectLife(this)">5</button>
+        </div>
+      </div>
+    </div>
+    <div class="filter-footer">
+      <button class="btn-list" onclick="showListModal()">年表形式で見る</button>
+      <button class="btn-iqq" onclick="window.open('https://sen85160.github.io/each-history-quiz/','_blank')">一問一答を対策する</button>
+      <div class="count-badge">対象：<span id="count-display">0</span> 問</div>
+      <button class="btn-primary" id="btn-start-game" onclick="startGame()">▶ スタート</button>
+    </div>
+  </div>
+</div>
+
+<!-- モーダル -->
+<div class="modal-overlay" id="modal-list">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div class="modal-title">問題一覧（<span id="modal-count">0</span>問）</div>
+      <button class="btn-secondary" style="padding:5px 14px;font-size:12px;" onclick="closeModal()">閉じる</button>
+    </div>
+    <div class="q-list" id="modal-qlist"></div>
+  </div>
+</div>
+
+<!-- ══ 通常ゲーム ══ -->
+<div id="screen-game" class="screen">
+  <div class="game-top-bar" id="top-bar-cells"></div>
+  <div class="game-hud">
+    <button class="hud-back-btn" onclick="confirmBackToTitle()">← タイトル</button>
+    <div class="hud-mode-label">通常</div>
+    <div class="hud-lives" id="hud-lives"></div>
+  </div>
+  <div class="game-center">
+    <div class="timer-wrap">
+      <div class="timer-ring">
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <circle class="timer-bg" cx="40" cy="40" r="33"/>
+          <circle class="timer-fg" id="timer-circle" cx="40" cy="40" r="33" stroke-dasharray="207.3" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-text" id="timer-text">10</div>
+      </div>
+    </div>
+    <div class="q-card">
+      <div class="q-num-label" id="q-number">問題 1 / 7</div>
+      <div class="q-body" id="q-body">問題文</div>
+      <div class="q-hint-label" id="q-hint"></div>
+    </div>
+  </div>
+  <div class="game-input-area">
+    <div class="input-row">
+      <input type="text" id="ans-input" class="ans-input" placeholder="年号を入力" autocomplete="off" inputmode="numeric">
+      <button class="btn-answer" onclick="submitAnswer()">回答</button>
+    </div>
+    <div class="input-hint-text">Enter キーでも回答できます</div>
+  </div>
+</div>
+
+<!-- ══ 解説画面 ══ -->
+<div id="screen-explain" class="screen explain-bg-correct">
+  <div class="explain-card">
+    <div class="explain-badge" id="explain-badge">正解！</div>
+
+    <!-- 並び替えモード用：正解の順序表 -->
+    <div class="explain-sort-table" id="explain-sort-table"></div>
+
+    <!-- 不正解時：あなたの解答 -->
+    <div class="explain-your-wrap" id="explain-your-wrap" style="display:none">
+      <div class="explain-section-label">あなたの解答</div>
+      <div class="explain-your-table" id="explain-your-table"></div>
+    </div>
+
+    <!-- 通常モード用 -->
+    <div class="explain-normal" id="explain-normal" style="display:none">
+      <div class="explain-ans-label">正解</div>
+      <div class="explain-ans" id="explain-ans"></div>
+      <div class="explain-your" id="explain-your"></div>
+    </div>
+
+    <div class="explain-tags" id="explain-tags"></div>
+    <button class="btn-next" onclick="nextQuestion()">次へ →</button>
+  </div>
+  <div class="enter-hint">Enter キーでも次へ進めます</div>
+</div>
+
+<!-- ══ 並び替えモード ══ -->
+<div id="screen-sort" class="screen">
+  <div class="sort-top-bar" id="sort-top-bar-cells"></div>
+  <div class="sort-hud">
+    <button class="hud-back-btn" onclick="confirmBackToTitle()">← タイトル</button>
+    <div class="hud-mode-label">並び替え &nbsp; <span id="sort-cur">1</span> / <span id="sort-total">5</span></div>
+
+  </div>
+  <div class="sort-center">
+    <div class="sort-instruction">古い順（左が古い）にカードをはめよう</div>
+    <!-- 上段：ドロップ枠 -->
+    <div class="sort-slots-row" id="sort-slots-row"></div>
+    <!-- 下段：カード -->
+    <div class="sort-cards-row" id="sort-cards-row"></div>
+  </div>
+  <div class="sort-submit-area">
+    <button class="btn-sort-submit" id="sort-submit-btn" onclick="submitSort()" disabled>これが答えです</button>
+    <div class="input-hint-text">4つすべてはめると回答できます</div>
+  </div>
+</div>
+
+<!-- ══ ゲームオーバー ══ -->
+<div id="screen-gameover" class="screen">
+  <div class="result-icon">💀</div>
+  <div class="result-title">ゲームオーバー</div>
+  <div class="result-sub">ライフがなくなりました</div>
+  <div class="result-stats">
+    <div class="stat-box"><div class="stat-num" id="go-correct">0</div><div class="stat-label">正解数</div></div>
+    <div class="stat-box"><div class="stat-num" id="go-total">0</div><div class="stat-label">出題数</div></div>
+  </div>
+  <div class="result-btns">
+    <button class="btn-primary" onclick="showScreen('screen-filter')">もう一度</button>
+    <button class="btn-secondary" onclick="showScreen('screen-title')" style="background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.4);color:#fff;">タイトルへ</button>
+  </div>
+</div>
+
+<!-- ══ クリア ══ -->
+<div id="screen-clear" class="screen">
+  <div class="result-icon">🏆</div>
+  <div class="result-title">クリア！</div>
+  <div class="result-sub" id="clear-sub">全問終了！</div>
+  <div class="result-stats">
+    <div class="stat-box"><div class="stat-num" id="cl-correct">0</div><div class="stat-label">正解数</div></div>
+    <div class="stat-box"><div class="stat-num" id="cl-total">0</div><div class="stat-label">出題数</div></div>
+    <div class="stat-box"><div class="stat-num" id="cl-rate">0%</div><div class="stat-label">正答率</div></div>
+  </div>
+  <div class="result-btns">
+    <button class="btn-primary" onclick="showScreen('screen-filter')">もう一度</button>
+    <button class="btn-secondary" onclick="showScreen('screen-title')" style="background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.4);color:#fff;">タイトルへ</button>
+  </div>
+</div>
+
+<script>
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  問題データ（体言止め）
+// ━━━━━━━━━━━━━━━━━━━━━━
+const QUESTIONS = [
+  { q:"弥生時代の成立（◯世紀）", a:"前4世紀", subject:"日本史", era:"弥生", region:"日本", theme:["その他"], century:true, ans:-4 },
+  { q:"奴国の王が光武帝から金印を与えられる", a:"57", subject:"日本史", era:"弥生", region:"日本", theme:["政策"], ans:57 },
+  { q:"帥升が生口160人を安帝に献上", a:"107", subject:"日本史", era:"弥生", region:"日本", theme:["政策"], ans:107 },
+  { q:"倭国大乱（◯世紀）", a:"2世紀", subject:"日本史", era:"弥生", region:"日本", theme:["戦争"], century:true, ans:2 },
+  { q:"卑弥呼が親魏倭王の称号を与えられる", a:"239", subject:"日本史", era:"弥生", region:"日本", theme:["政策"], ans:239 },
+  { q:"磐井の乱", a:"527", subject:"日本史", era:"古墳", region:"日本", theme:["戦争"], ans:527 },
+  { q:"仏教公伝", a:"538", subject:"日本史", era:"古墳", region:"日本", theme:["その他"], ans:538 },
+  { q:"倭国が高句麗と交戦（◯世紀）", a:"4世紀", subject:"日本史", era:"古墳", region:"日本", theme:["戦争"], century:true, ans:4 },
+  { q:"物部守屋が滅ぼされる", a:"587", subject:"日本史", era:"飛鳥", region:"日本", theme:["戦争"], ans:587 },
+  { q:"蘇我馬子、崇峻天皇を暗殺", a:"592", subject:"日本史", era:"飛鳥", region:"日本", theme:["その他"], ans:592 },
+  { q:"冠位十二階の制", a:"603", subject:"日本史", era:"飛鳥", region:"日本", theme:["政策"], ans:603 },
+  { q:"憲法十七条", a:"604", subject:"日本史", era:"飛鳥", region:"日本", theme:["政策"], ans:604 },
+  { q:"第一回遣隋使派遣", a:"600", subject:"日本史", era:"飛鳥", region:"日本", theme:["政策"], ans:600 },
+  { q:"小野妹子を遣隋使として派遣", a:"607", subject:"日本史", era:"飛鳥", region:"日本", theme:["政策"], ans:607 },
+  { q:"裴世清、来日", a:"608", subject:"日本史", era:"飛鳥", region:"日本", theme:["政策"], ans:608 },
+  { q:"アッカド人の国家が成立（◯世紀）", a:"前24世紀", subject:"世界史", era:"古代", region:"西アジア", theme:["国家"], century:true, ans:-24 },
+  { q:"バビロン第一王朝の成立（◯世紀）", a:"前19世紀", subject:"世界史", era:"古代", region:"西アジア", theme:["国家"], century:true, ans:-19 },
+  { q:"ヒッタイト人の国が建国", a:"前1680", subject:"世界史", era:"古代", region:"西アジア", theme:["国家"], ans:-1680 },
+  { q:"エジプト古王国の成立（◯世紀）", a:"前27世紀", subject:"世界史", era:"古代", region:"アフリカ", theme:["国家"], century:true, ans:-27 },
+  { q:"エジプト中王国の成立（◯世紀）", a:"前21世紀", subject:"世界史", era:"古代", region:"アフリカ", theme:["国家"], century:true, ans:-21 },
+  { q:"ヒクソスの侵入（◯世紀）", a:"前18世紀", subject:"世界史", era:"古代", region:"アフリカ", theme:["戦争"], century:true, ans:-18 },
+  { q:"エジプト新王国の成立（◯世紀）", a:"前16世紀", subject:"世界史", era:"古代", region:"アフリカ", theme:["国家"], century:true, ans:-16 },
+  { q:"ヘブライ王国の分裂（◯世紀）", a:"前10世紀", subject:"世界史", era:"古代", region:"西アジア", theme:["国家"], century:true, ans:-10 },
+  { q:"アッシリア王国がオリエントを統一", a:"前663", subject:"世界史", era:"古代", region:"西アジア", theme:["国家"], ans:-663 },
+  { q:"4王国分立", a:"前612", subject:"世界史", era:"古代", region:"西アジア", theme:["政策"], ans:-612 },
+  { q:"アケメネス朝がオリエントを統一", a:"前525", subject:"世界史", era:"古代", region:"西アジア", theme:["国家"], ans:-525 },
+  { q:"蘇我馬子、山背大兄王を暗殺", a:"643", subject:"日本史", era:"飛鳥", region:"日本", theme:["その他"], ans:643 },
+  { q:"乙巳の変", a:"645", subject:"日本史", era:"飛鳥", region:"日本", theme:["戦争"], ans:645 },
+  { q:"改新の詔", a:"646", subject:"日本史", era:"飛鳥", region:"日本", theme:["政策"], ans:646 },
+  { q:"白村江の戦い", a:"663", subject:"日本史", era:"飛鳥", region:"日本", theme:["戦争", "政策"], ans:663 },
+  { q:"近江大津宮遷都", a:"667", subject:"日本史", era:"飛鳥", region:"日本", theme:["政策"], ans:667 },
+  { q:"庚午年籍", a:"670", subject:"日本史", era:"飛鳥", region:"日本", theme:["政策"], ans:670 },
+  { q:"壬申の乱", a:"672", subject:"日本史", era:"飛鳥", region:"日本", theme:["戦争"], ans:672 },
+  { q:"八色の姓", a:"683", subject:"日本史", era:"飛鳥", region:"日本", theme:["政策"], ans:683 },
+  { q:"飛鳥浄御原令", a:"689", subject:"日本史", era:"飛鳥", region:"日本", theme:["政策"], ans:689 },
+  { q:"庚寅年籍", a:"690", subject:"日本史", era:"飛鳥", region:"日本", theme:["政策"], ans:690 },
+  { q:"藤原京遷都", a:"694", subject:"日本史", era:"飛鳥", region:"日本", theme:["政策"], ans:694 },
+  { q:"インダス文明、おこる(◯世紀)", a:"前26世紀", subject:"世界史", era:"古代", region:"南アジア", theme:["国家"], century:true, ans:-26 },
+  { q:"クレタ文明、生まれる(◯世紀)", a:"前20世紀", subject:"世界史", era:"古代", region:"地中海沿岸", theme:["国家"], century:true, ans:-20 },
+  { q:"ミケーネ文明、おこる(◯世紀)", a:"前16世紀", subject:"世界史", era:"古代", region:"地中海沿岸", theme:["国家"], century:true, ans:-16 },
+  { q:"殷、興る(◯世紀)", a:"前16世紀", subject:"世界史", era:"古代", region:"中華王朝", theme:["国家"], century:true, ans:-16 },
+  { q:"カッシート王国、成立", a:"前1550", subject:"世界史", era:"古代", region:"西アジア", theme:["国家"], ans:-1550 },
+  { q:"アーリア人、パンジャーブ地方へ移動(◯世紀)", a:"前15世紀", subject:"世界史", era:"古代", region:"南アジア", theme:["その他"], century:true, ans:-15 },
+  { q:"アメンホテプ4世の改革がはじまる", a:"前1364", subject:"世界史", era:"古代", region:"アフリカ", theme:["政策"], ans:-1364 },
+  { q:"カデシュの戦い", a:"前1286", subject:"世界史", era:"古代", region:"西アジア", theme:["戦争"], ans:-1286 },
+  { q:"周の成立", a:"前1024", subject:"世界史", era:"古代", region:"中華王朝", theme:["国家"], ans:-1024 },
+  { q:"アーリア人、ガンジス川流域に進出(◯世紀)", a:"前10世紀", subject:"世界史", era:"古代", region:"南アジア", theme:["その他"], century:true, ans:-10 },
+  { q:"周、洛邑に遷都", a:"前770", subject:"世界史", era:"古代", region:"中華王朝", theme:["政策"], ans:-770 },
+  { q:"バビロン捕囚", a:"前585", subject:"世界史", era:"古代", region:"西アジア", theme:["その他"], ans:-585 },
+  { q:"大宝律令の制定", a:"701", subject:"日本史", era:"飛鳥", region:"日本", theme:["政策"], ans:701 },
+  { q:"養老律令の制定", a:"718", subject:"日本史", era:"奈良", region:"日本", theme:["政策"], ans:718 },
+  { q:"養老律令の施行", a:"758", subject:"日本史", era:"奈良", region:"日本", theme:["政策"], ans:758 }
+];
+
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  状態
+// ━━━━━━━━━━━━━━━━━━━━━━
+const allEraJp = ['旧石器','縄文','弥生','古墳','飛鳥','奈良','平安','鎌倉','室町','戦国','江戸','明治','大正','戦前','戦後','現代'];
+const allEraWorld = ['先史・石器時代','古代','中世','近世','近代','現代'];
+const allRegion = ['中華王朝','朝鮮半島','東南アジア','南アジア','西アジア','中央ユーラシア','地中海沿岸','イスラム圏','ヨーロッパ','フランス','イギリス','ドイツ','ロシア','アフリカ','アメリカ','ラテン・南アメリカ','日本'];
+const allTheme = ['戦争','文化','国家','政策','その他'];
+
+let state = {
+  mode:'normal',
+  selSubject:new Set(['日本史','世界史']),
+  selEraJp:new Set(allEraJp),
+  selEraWorld:new Set(allEraWorld),
+  selRegion:new Set(allRegion),
+  selTheme:new Set(allTheme),
+  questionCount:7, life:3,
+  questions:[], currentIdx:0, remainLife:3, correctCount:0,
+  timerVal:15, timerInterval:null,
+  sortGroups:[], sortCurrentIdx:0,
+  slotContents:[], // 並び替え枠の内容
+};
+
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  画面切替
+// ━━━━━━━━━━━━━━━━━━━━━━
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+function gotoFilter() { showScreen('screen-filter'); updateCountDisplay(); updateSubjectCards(); }
+
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  フィルタ
+// ━━━━━━━━━━━━━━━━━━━━━━
+function toggleTag(el) {
+  const g=el.dataset.group, v=el.dataset.val;
+  const m={subject:state.selSubject,'era-jp':state.selEraJp,'era-world':state.selEraWorld,region:state.selRegion,theme:state.selTheme};
+  if(m[g].has(v)){m[g].delete(v);el.classList.remove('selected');}
+  else{m[g].add(v);el.classList.add('selected');}
+  updateSubjectCards(); updateCountDisplay();
+}
+function selectAll(g) {
+  const m={'era-jp':state.selEraJp,'era-world':state.selEraWorld,region:state.selRegion,theme:state.selTheme};
+  document.querySelectorAll(`[data-group="${g}"]`).forEach(el=>{m[g].add(el.dataset.val);el.classList.add('selected');});
+  updateCountDisplay();
+}
+function clearFilter(g) {
+  const m={subject:state.selSubject,'era-jp':state.selEraJp,'era-world':state.selEraWorld,region:state.selRegion,theme:state.selTheme};
+  m[g].clear();
+  document.querySelectorAll(`[data-group="${g}"]`).forEach(el=>el.classList.remove('selected'));
+  updateSubjectCards(); updateCountDisplay();
+}
+function updateSubjectCards() {
+  document.getElementById('era-jp-card').style.display=state.selSubject.has('日本史')?'':'none';
+  document.getElementById('era-world-card').style.display=state.selSubject.has('世界史')?'':'none';
+}
+function resetFilters() {
+  state.selSubject=new Set(['日本史','世界史']);
+  state.selEraJp=new Set(allEraJp); state.selEraWorld=new Set(allEraWorld);
+  state.selRegion=new Set(allRegion); state.selTheme=new Set(allTheme);
+  document.querySelectorAll('.tag').forEach(el=>el.classList.add('selected'));
+  updateSubjectCards(); updateCountDisplay();
+}
+function getFiltered() {
+  return QUESTIONS.filter(q=>{
+    if(!state.selSubject.has(q.subject)) return false;
+    if(q.subject==='日本史'&&!state.selEraJp.has(q.era)) return false;
+    if(q.subject==='世界史'&&!state.selEraWorld.has(q.era)) return false;
+    if(!state.selRegion.has(q.region)) return false;
+    if(!q.theme.some(t=>state.selTheme.has(t))) return false;
+    return true;
+  });
+}
+function updateCountDisplay() {
+  const n=getFiltered().length;
+  document.getElementById('count-display').textContent=n;
+  document.getElementById('btn-start-game').disabled=n===0;
+}
+function selectCount(btn) {
+  document.querySelectorAll('#count-options .opt-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const ci=document.getElementById('custom-count');
+  if(btn.dataset.val==='custom'){ci.classList.add('visible');state.questionCount=parseInt(ci.value)||10;}
+  else{ci.classList.remove('visible');state.questionCount=btn.dataset.val==='all'?999999:parseInt(btn.dataset.val);}
+}
+function selectLife(btn) {
+  document.querySelectorAll('.opt-btn.life').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected'); state.life=parseInt(btn.dataset.val);
+}
+function selectMode(m) {
+  state.mode=m;
+  document.getElementById('mode-normal').classList.toggle('selected',m==='normal');
+  document.getElementById('mode-sort').classList.toggle('selected',m==='sort');
+  document.getElementById('life-card').style.display=m==='normal'?'':'none';
+}
+document.getElementById('custom-count').addEventListener('input',function(){state.questionCount=parseInt(this.value)||1;});
+
+function showListModal() {
+  const qs=[...getFiltered()].sort((a,b)=>getSortAns(a)-getSortAns(b));
+  document.getElementById('modal-count').textContent=qs.length;
+  const container=document.getElementById('modal-qlist'); container.innerHTML='';
+  container.className='timeline-list';
+  qs.forEach(q=>{
+    const d=document.createElement('div'); d.className='timeline-item';
+    // 年号表示：世紀問題はそのまま、通常は西暦表示
+    const yearLabel = q.century ? q.a : (q.ans<0 ? `前${Math.abs(q.ans)}年` : `${q.ans}年`);
+    d.innerHTML=`
+      <div class="timeline-year">${yearLabel}</div>
+      <div class="timeline-body">
+        <div class="timeline-event">${q.q}</div>
+        <div class="timeline-tags">
+          <span class="timeline-tag">${q.subject}</span>
+          <span class="timeline-tag">${q.era}</span>
+          <span class="timeline-tag">${q.region}</span>
+          ${q.theme.map(t=>`<span class="timeline-tag">${t}</span>`).join('')}
+        </div>
+      </div>`;
+    container.appendChild(d);
+  });
+  document.getElementById('modal-list').classList.add('active');
+}
+function closeModal(){document.getElementById('modal-list').classList.remove('active');}
+
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  ゲーム開始
+// ━━━━━━━━━━━━━━━━━━━━━━
+function startGame() {
+  const pool=getFiltered(); if(!pool.length) return;
+  const shuffled=[...pool].sort(()=>Math.random()-0.5);
+  const count=Math.min(state.questionCount,shuffled.length);
+  state.questions=shuffled.slice(0,count);
+  state.currentIdx=0; state.remainLife=state.life; state.correctCount=0;
+  if(state.mode==='sort'){
+    buildSortGroups(); showScreen('screen-sort'); renderSortQuestion();
+  } else {
+    buildTopBar('top-bar-cells',state.questions.length);
+    showScreen('screen-game'); renderQuestion();
+  }
+}
+
+function buildTopBar(elId,total) {
+  const bar=document.getElementById(elId); bar.innerHTML='';
+  const max=Math.min(total,30);
+  for(let i=0;i<max;i++){
+    const c=document.createElement('div'); c.className='progress-cell'; c.id=`cell-${elId}-${i}`; c.textContent=i+1;
+    bar.appendChild(c);
+  }
+}
+function updateTopBar(elId,cur) {
+  document.querySelectorAll(`#${elId} .progress-cell`).forEach((c,i)=>{
+    c.className='progress-cell'+(i<cur?' done':i===cur?' current':'');
+  });
+}
+function renderLives(id) {
+  const el=document.getElementById(id); el.innerHTML='';
+  for(let i=0;i<state.life;i++){
+    const h=document.createElement('div');
+    h.className='heart-icon'+(i>=state.remainLife?' lost':'');
+    h.textContent=i<state.remainLife?'♥':'♡';
+    el.appendChild(h);
+  }
+  const cnt=document.createElement('span'); cnt.className='lives-count'; cnt.textContent=`×${state.remainLife}`;
+  el.appendChild(cnt);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  フラッシュ演出
+// ━━━━━━━━━━━━━━━━━━━━━━
+function showFlash(type) {
+  const flash=document.getElementById('result-flash');
+  const label=document.getElementById('flash-label');
+  flash.className='result-flash show '+type+'-flash';
+  label.textContent = type==='correct'?'正解！': type==='near'?'おしい！': type==='wrong'?'不正解': '時間切れ';
+  setTimeout(()=>{ flash.className='result-flash'; },700);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  通常モード
+// ━━━━━━━━━━━━━━━━━━━━━━
+function renderQuestion() {
+  const q=state.questions[state.currentIdx];
+  updateTopBar('top-bar-cells',state.currentIdx);
+  renderLives('hud-lives');
+  document.getElementById('q-number').textContent=`問題 ${state.currentIdx+1} / ${state.questions.length}`;
+  document.getElementById('q-body').textContent=q.q;
+  document.getElementById('q-hint').textContent=q.century?'（数字で回答　例: 7、-2）':q.ans<0?'（例: -221）':'（西暦を数字で入力）';
+  const inp=document.getElementById('ans-input');
+  inp.value=''; inp.className='ans-input';
+  inp.placeholder=q.century?'世紀を入力':'年号を入力';
+  inp.focus();
+  startTimer();
+}
+
+function startTimer() {
+  clearInterval(state.timerInterval);
+  state.timerVal=15; updateTimerUI();
+  state.timerInterval=setInterval(()=>{
+    state.timerVal--; updateTimerUI();
+    if(state.timerVal<=0){clearInterval(state.timerInterval); timeUp();}
+  },1000);
+}
+function updateTimerUI() {
+  const r=33, circ=2*Math.PI*r, pct=state.timerVal/15;
+  const c=document.getElementById('timer-circle');
+  c.style.strokeDashoffset=circ*(1-pct);
+  c.style.stroke=state.timerVal>8?'#42a5f5':state.timerVal>4?'#ffa726':'#ef5350';
+  document.getElementById('timer-text').textContent=state.timerVal;
+}
+function timeUp() {
+  state.remainLife--;
+  showFlash('time');
+  setTimeout(()=>showExplain(state.questions[state.currentIdx],'time',null,null),400);
+}
+
+document.getElementById('ans-input').addEventListener('keydown',e=>{if(e.key==='Enter')submitAnswer();});
+
+function normalizeInput(raw) {
+  return raw.replace(/[０-９]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0))
+            .replace(/[－−ー]/g,'-').trim();
+}
+function submitAnswer() {
+  const raw=document.getElementById('ans-input').value;
+  const norm=normalizeInput(raw);
+  const num=parseInt(norm,10);
+  if(isNaN(num)) return;
+  const q=state.questions[state.currentIdx];
+  const inp=document.getElementById('ans-input');
+
+  if(num===q.ans){
+    clearInterval(state.timerInterval);
+    inp.classList.add('correct');
+    state.correctCount++;
+    showFlash('correct');
+    setTimeout(()=>showExplain(q,'correct',num,null),600);
+  } else if(!q.century&&Math.abs(num-q.ans)<=10){
+    inp.classList.add('near');
+    inp.placeholder=`おしい！差${Math.abs(num-q.ans)}年`;
+    showFlash('near');
+    setTimeout(()=>{inp.value='';inp.className='ans-input';inp.focus();},600);
+  } else {
+    inp.classList.add('wrong');
+    showFlash('wrong');
+    setTimeout(()=>{inp.value='';inp.className='ans-input';inp.focus();},400);
+  }
+}
+
+function showExplain(q, result, userAns, sortData) {
+  showScreen('screen-explain');
+  const scr = document.getElementById('screen-explain');
+  const bgMap = {correct:'explain-bg-correct',near:'explain-bg-near',wrong:'explain-bg-wrong',time:'explain-bg-time'};
+  scr.className = 'screen active ' + bgMap[result];
+
+  const badge = document.getElementById('explain-badge');
+  const labels = {correct:'正解！', near:'おしい！', wrong:'不正解', time:'時間切れ'};
+  const badgeCls = {correct:'badge-correct', near:'badge-near', wrong:'badge-wrong', time:'badge-time'};
+  badge.textContent = labels[result];
+  badge.className = 'explain-badge ' + badgeCls[result];
+
+  const sortTable  = document.getElementById('explain-sort-table');
+  const yourWrap   = document.getElementById('explain-your-wrap');
+  const yourTable  = document.getElementById('explain-your-table');
+  const normalDiv  = document.getElementById('explain-normal');
+  const tagsDiv    = document.getElementById('explain-tags');
+
+  if(sortData){
+    sortTable.style.display = '';
+    normalDiv.style.display = 'none';
+    sortTable.innerHTML = '';
+
+    sortData.sorted.forEach((item, i) => {
+      const userPos  = sortData.userOrder.indexOf(item.q);
+      const isWrong  = result === 'wrong' && userPos !== i;
+      const row = document.createElement('div');
+      row.className = 'explain-sort-row ' + (isWrong ? 'wrong-row' : 'correct-row');
+      row.innerHTML =
+        `<div class="explain-sort-rank">${i+1}</div>` +
+        `<div class="explain-sort-year">${item.a}</div>` +
+        `<div class="explain-sort-arrow">→</div>` +
+        `<div class="explain-sort-event">${item.q}</div>`;
+      sortTable.appendChild(row);
+    });
+
+    if(result === 'wrong'){
+      yourWrap.style.display = '';
+      yourTable.innerHTML = '';
+      sortData.userOrder.forEach((qtxt, i) => {
+        const correctPos = sortData.sorted.findIndex(s => s.q === qtxt);
+        const isWrong = correctPos !== i;
+        const row = document.createElement('div');
+        row.className = 'explain-your-row' + (isWrong ? ' wrong-pos' : '');
+        row.innerHTML =
+          `<div class="explain-your-rank">${i+1}</div>` +
+          `<div class="explain-your-event">${qtxt}</div>`;
+        yourTable.appendChild(row);
+      });
+    } else {
+      yourWrap.style.display = 'none';
+    }
+    tagsDiv.innerHTML = '';
+
+  } else {
+    sortTable.style.display = 'none';
+    yourWrap.style.display  = 'none';
+    normalDiv.style.display = '';
+    document.getElementById('explain-ans').textContent = q.a;
+    document.getElementById('explain-your').textContent = result==='time' ? '時間内に正解できませんでした' : '';
+    tagsDiv.innerHTML = [q.subject, q.era, q.region, ...q.theme]
+      .map(t => `<span class="explain-tag">${t}</span>`).join('');
+  }
+}
+
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('screen-explain').classList.contains('active')&&e.key==='Enter') nextQuestion();
+});
+
+function nextQuestion() {
+  if(state.mode==='sort'){
+    if(state.sortCurrentIdx>=state.sortGroups.length){showClear();return;}
+    showScreen('screen-sort'); renderSortQuestion();
+  } else {
+    state.currentIdx++;
+    if(state.currentIdx>=state.questions.length){showClear();return;}
+    showScreen('screen-game'); renderQuestion();
+  }
+}
+
+function showGameOver() {
+  document.getElementById('go-correct').textContent=state.correctCount;
+  document.getElementById('go-total').textContent=state.currentIdx;
+  showScreen('screen-gameover');
+}
+function showClear() {
+  const total=state.mode==='sort'?state.sortCurrentIdx:state.questions.length;
+  const rate=total>0?Math.round((state.correctCount/total)*100):0;
+  document.getElementById('cl-correct').textContent=state.correctCount;
+  document.getElementById('cl-total').textContent=total;
+  document.getElementById('cl-rate').textContent=rate+'%';
+  document.getElementById('clear-sub').textContent=rate>=80?'素晴らしい！':'もう一度挑戦しよう！';
+  showScreen('screen-clear');
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  並び替えモード
+// ━━━━━━━━━━━━━━━━━━━━━━
+function getEraRange(q) {
+  if(['戦後','現代'].includes(q.era)) return 30;
+  if(['明治','大正','戦前'].includes(q.era)) return 30;
+  if(['近代'].includes(q.era)) return 80;
+  if(['近世'].includes(q.era)) return 170;
+  if(['室町','戦国','江戸'].includes(q.era)) return 50;
+  if(['鎌倉','平安','奈良','飛鳥','中世'].includes(q.era)) return 100;
+  if(['弥生','古墳'].includes(q.era)) return 250;
+  if(['先史・石器時代'].includes(q.era)) return 5000;
+  if(['古代'].includes(q.era)) return 1000;
+  return 500;
+}
+
+// 並び替え用：問題の「年代範囲」を返す [min, max]
+// 通常問題 → [ans, ans]（点）
+// 世紀問題 → その世紀全体の範囲（例：2世紀→[101,200]、前24世紀→[-2400,-2301]）
+function getSortRange(q) {
+  if(!q.century) return [q.ans, q.ans];
+  const c = q.ans; // 世紀数（正=西暦、負=紀元前）
+  if(c > 0){
+    return [(c - 1) * 100 + 1, c * 100];
+  } else {
+    // 負の世紀：例 ans=-24 → 紀元前24世紀 → -2400〜-2301
+    return [c * 100, (c + 1) * 100 - 1];
+  }
+}
+
+// 並び替え用ソートキー：世紀問題はその世紀の中央値で代表させる
+function getSortAns(q) {
+  if(!q.century) return q.ans;
+  const [lo, hi] = getSortRange(q);
+  return (lo + hi) / 2;
+}
+
+// 2つの問題の年代範囲が重なるか（順序が確定できない）
+function rangesOverlap(qa, qb) {
+  const [aLo, aHi] = getSortRange(qa);
+  const [bLo, bHi] = getSortRange(qb);
+  return aLo <= bHi && bLo <= aHi;
+}
+
+// 重み付きランダム選択：weightArr[i] の確率で index i を選ぶ
+function weightedPick(items, weights) {
+  const total = weights.reduce((s, w) => s + w, 0);
+  let r = Math.random() * total;
+  for(let i = 0; i < items.length; i++){
+    r -= weights[i];
+    if(r <= 0) return i;
+  }
+  return items.length - 1;
+}
+
+function buildSortGroups() {
+  const pool = getFiltered();
+  if(pool.length < 4){ alert('並び替えモードには4問以上必要です'); return; }
+  const targetCount = Math.min(state.questionCount, 50);
+  state.sortGroups = [];
+
+  const usedCombos = new Set();   // 完全一致の組み合わせキー
+  const usedGroups = [];           // 過去に出た問題セット（配列of配列）
+  const questionAppearCount = {}; // 各問題テキストの出題回数
+
+  for(let attempt = 0; attempt < 5000 && state.sortGroups.length < targetCount; attempt++){
+    // 1問目：完全ランダムに選ぶ
+    const firstIdx = Math.floor(Math.random() * pool.length);
+    const first = pool[firstIdx];
+    const firstAns = getSortAns(first);
+    const limit = getEraRange(first);
+
+    // 2〜4問目：スパン制限内の候補
+    const candidates = pool.filter((q, i) => {
+      if(i === firstIdx) return false;
+      const diff = Math.abs(getSortAns(q) - firstAns);
+      return diff <= limit;
+    });
+    if(candidates.length < 3) continue;
+
+    // 重みを計算（距離が近いほど重み大）
+    const weights = candidates.map(q => {
+      const diff = Math.abs(getSortAns(q) - firstAns);
+      return 1 / (diff + 1);
+    });
+
+    // 重み付きランダムで3問選ぶ
+    const picked = [first];
+    const remaining = candidates.map((q, i) => ({q, w: weights[i]}));
+    for(let k = 0; k < 3; k++){
+      if(remaining.length === 0) break;
+      const ws = remaining.map(r => r.w);
+      const idx = weightedPick(remaining, ws);
+      picked.push(remaining[idx].q);
+      remaining.splice(idx, 1);
+    }
+    if(picked.length < 4) continue;
+    const pick = picked;
+
+    // ① 同じ問題テキストが3つ以上ならNG（2つまでOK）
+    const txtCount = {};
+    for(const q of pick){ txtCount[q.q] = (txtCount[q.q] || 0) + 1; }
+    if(Object.values(txtCount).some(c => c >= 3)) continue;
+
+    // ② 順序不定チェック
+    let ambiguous = false;
+    for(let i = 0; i < 4 && !ambiguous; i++){
+      for(let j = i + 1; j < 4 && !ambiguous; j++){
+        if(pick[i].q === pick[j].q) continue;
+        if(rangesOverlap(pick[i], pick[j])) ambiguous = true;
+      }
+    }
+    if(ambiguous) continue;
+
+    // ③ 完全一致の組み合わせ重複排除
+    const key = pick.map(q => q.q).sort().join('|');
+    if(usedCombos.has(key)) continue;
+
+    // ④ 過去の組と3問以上被りNG
+    const pickSet = pick.map(q => q.q);
+    let tooSimilar = false;
+    for(const prev of usedGroups){
+      const overlap = pickSet.filter(t => prev.includes(t)).length;
+      if(overlap >= 3){ tooSimilar = true; break; }
+    }
+    if(tooSimilar) continue;
+
+    // ⑤ 各問題の出題回数が3回を超えるならNG
+    let overLimit = false;
+    for(const q of pick){
+      const cnt = (questionAppearCount[q.q] || 0) + (txtCount[q.q] || 1);
+      if(cnt > 2){ overLimit = true; break; }
+    }
+    if(overLimit) continue;
+
+    // 採用：カウントを更新
+    for(const q of pick){
+      questionAppearCount[q.q] = (questionAppearCount[q.q] || 0) + 1;
+    }
+    state.sortGroups.push(pick);
+    usedCombos.add(key);
+    usedGroups.push(pickSet);
+  }
+
+  // フォールバック：スパン制限は外すが、順序確定チェック（rangesOverlap）は維持
+  if(state.sortGroups.length === 0){
+    const shuffled2 = [...pool].sort(() => Math.random() - 0.5);
+    let fallbackPick = null;
+    for(let i = 0; i + 3 < shuffled2.length; i++){
+      const candidate = shuffled2.slice(i, i + 4);
+      let ok = true;
+      for(let a = 0; a < 4 && ok; a++){
+        for(let b = a + 1; b < 4 && ok; b++){
+          if(candidate[a].q !== candidate[b].q && rangesOverlap(candidate[a], candidate[b])) ok = false;
+        }
+      }
+      if(ok){ fallbackPick = candidate; break; }
+    }
+    if(!fallbackPick) fallbackPick = shuffled2.slice(0, 4);
+    state.sortGroups.push(fallbackPick);
+  }
+
+  state.sortCurrentIdx = 0;
+  buildTopBar('sort-top-bar-cells', state.sortGroups.length);
+}
+
+// スロット状態管理
+// state.slotContents = [q or null, q or null, q or null, q or null]
+
+function renderSortQuestion() {
+  if(state.sortCurrentIdx>=state.sortGroups.length){showClear();return;}
+  const group=state.sortGroups[state.sortCurrentIdx];
+  const display=[...group].sort(()=>Math.random()-0.5);
+  state.slotContents=[null,null,null,null];
+
+  document.getElementById('sort-cur').textContent=state.sortCurrentIdx+1;
+  document.getElementById('sort-total').textContent=state.sortGroups.length;
+  updateTopBar('sort-top-bar-cells',state.sortCurrentIdx);
+
+  renderSortUI(display, group);
+}
+
+function renderSortUI(displayCards, group) {
+  // 上段：スロット
+  const slotsRow=document.getElementById('sort-slots-row');
+  slotsRow.innerHTML='';
+
+  for(let i=0;i<4;i++){
+    const slot=document.createElement('div');
+    slot.className='sort-slot';
+    slot.dataset.idx=i;
+    const numLabel=document.createElement('div');
+    numLabel.className='slot-num';
+    numLabel.textContent=['①','②','③','④'][i];
+    slot.appendChild(numLabel);
+    slot.addEventListener('dragover',e=>{e.preventDefault();slot.classList.add('drag-over');});
+    slot.addEventListener('dragleave',()=>slot.classList.remove('drag-over'));
+    slot.addEventListener('drop',e=>{e.preventDefault();slot.classList.remove('drag-over');onDropSlot(e,i);});
+    slotsRow.appendChild(slot);
+    if(i<3){
+      const arrow=document.createElement('div');
+      arrow.className='sort-arrow';
+      arrow.innerHTML='→';
+      slotsRow.appendChild(arrow);
+    }
+  }
+
+  // 下段：カード
+  const cardsRow=document.getElementById('sort-cards-row');
+  cardsRow.innerHTML='';
+  displayCards.forEach((q,i)=>{
+    const card=document.createElement('div');
+    card.className='sort-card';
+    card.textContent=q.q;
+    card.draggable=true;
+    card.dataset.qidx=i;
+    card.dataset.qtxt=q.q;
+    card.addEventListener('dragstart',e=>{
+      e.dataTransfer.setData('text/plain', JSON.stringify({from:'cards',cardIdx:i,qtxt:q.q}));
+      setTimeout(()=>card.classList.add('dragging-card'),0);
+    });
+    card.addEventListener('dragend',()=>card.classList.remove('dragging-card'));
+    addTouchDrag(card, q, i, 'cards');
+    cardsRow.appendChild(card);
+  });
+
+  updateSubmitBtn();
+}
+
+function onDropSlot(e, slotIdx) {
+  let data;
+  try{ data=JSON.parse(e.dataTransfer.getData('text/plain')); }catch(err){ return; }
+
+  if(data.from==='cards'){
+    const qtxt=data.qtxt;
+    // 同じカードが既に他スロットにあれば解放
+    const prevSlot=state.slotContents.findIndex(s=>s&&s.q===qtxt);
+    if(prevSlot!==-1) state.slotContents[prevSlot]=null;
+    state.slotContents[slotIdx]=QUESTIONS.find(q=>q.q===qtxt)||{q:qtxt};
+    refreshSortUI();
+  } else if(data.from==='slot'){
+    const fromIdx=data.slotIdx;
+    const tmp=state.slotContents[fromIdx];
+    state.slotContents[fromIdx]=state.slotContents[slotIdx];
+    state.slotContents[slotIdx]=tmp;
+    refreshSortUI();
+  }
+}
+
+function refreshSortUI() {
+  const slotsRow=document.getElementById('sort-slots-row');
+  const slots=slotsRow.querySelectorAll('.sort-slot');
+  slots.forEach((slot,i)=>{
+    const existing=slot.querySelector('.slot-card');
+    if(existing) existing.remove();
+    slot.className='sort-slot';
+    if(state.slotContents[i]){
+      slot.classList.add('filled');
+      const card=document.createElement('div');
+      card.className='slot-card';
+      card.draggable=true;
+      const txt=document.createElement('div');
+      txt.className='slot-card-text';
+      txt.textContent=state.slotContents[i].q;
+      const rem=document.createElement('div');
+      rem.className='slot-remove';
+      rem.textContent='✕ 外す';
+      card.appendChild(txt);
+      card.appendChild(rem);
+      card.draggable=true;
+      card.addEventListener('dragstart',e=>{
+        e.dataTransfer.setData('text/plain',JSON.stringify({from:'slot',slotIdx:i,qtxt:state.slotContents[i].q}));
+      });
+      addTouchDragSlot(card, i);
+      rem.onclick=(e)=>{e.stopPropagation();state.slotContents[i]=null;refreshSortUI();};
+      slot.appendChild(card);
+    }
+  });
+
+  // 下段カード：スロットに入っているものを非表示
+  // 同じ問題文が複数ある場合、スロット使用数分だけ非表示にする
+  const usedCounts = {};
+  state.slotContents.filter(Boolean).forEach(q => {
+    usedCounts[q.q] = (usedCounts[q.q] || 0) + 1;
+  });
+  const hiddenCounts = {};
+  document.querySelectorAll('#sort-cards-row .sort-card').forEach(card => {
+    const txt = card.dataset.qtxt;
+    const usedN = usedCounts[txt] || 0;
+    const hiddenN = hiddenCounts[txt] || 0;
+    if(hiddenN < usedN){
+      card.classList.add('used');
+      hiddenCounts[txt] = hiddenN + 1;
+    } else {
+      card.classList.remove('used');
+    }
+  });
+
+  updateSubmitBtn();
+}
+
+function updateSubmitBtn() {
+  const filled=state.slotContents.filter(Boolean).length;
+  document.getElementById('sort-submit-btn').disabled=filled<4;
+}
+
+// タッチドラッグ（カード→スロット）
+let touchDragData=null;
+let touchClone=null;
+
+function addTouchDrag(card, q, cardIdx, from) {
+  card.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    touchDragData={from,cardIdx,qtxt:q.q};
+    const t=e.touches[0];
+    touchClone=card.cloneNode(true);
+    touchClone.style.cssText=`position:fixed;left:${t.clientX-60}px;top:${t.clientY-30}px;width:120px;z-index:999;opacity:0.85;pointer-events:none;border-radius:10px;`;
+    document.body.appendChild(touchClone);
+  },{passive:false});
+  card.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    const t=e.touches[0];
+    if(touchClone){touchClone.style.left=(t.clientX-60)+'px';touchClone.style.top=(t.clientY-30)+'px';}
+    const slotsRow=document.getElementById('sort-slots-row');
+    slotsRow.querySelectorAll('.sort-slot').forEach(s=>{
+      const r=s.getBoundingClientRect();
+      if(t.clientX>=r.left&&t.clientX<=r.right&&t.clientY>=r.top&&t.clientY<=r.bottom) s.classList.add('drag-over');
+      else s.classList.remove('drag-over');
+    });
+  },{passive:false});
+  card.addEventListener('touchend',e=>{
+    const t=e.changedTouches[0];
+    if(touchClone){touchClone.remove();touchClone=null;}
+    document.querySelectorAll('.sort-slot').forEach(s=>s.classList.remove('drag-over'));
+    const slotsRow=document.getElementById('sort-slots-row');
+    const slots=slotsRow.querySelectorAll('.sort-slot');
+    slots.forEach((s,i)=>{
+      const r=s.getBoundingClientRect();
+      if(t.clientX>=r.left&&t.clientX<=r.right&&t.clientY>=r.top&&t.clientY<=r.bottom){
+        if(touchDragData){
+          const prevSlot=state.slotContents.findIndex(sc=>sc&&sc.q===touchDragData.qtxt);
+          if(prevSlot!==-1) state.slotContents[prevSlot]=null;
+          state.slotContents[i]=QUESTIONS.find(q=>q.q===touchDragData.qtxt)||{q:touchDragData.qtxt};
+          refreshSortUI();
+        }
+      }
+    });
+    touchDragData=null;
+  });
+}
+
+function addTouchDragSlot(card, slotIdx) {
+  card.addEventListener('touchstart',e=>{
+    e.preventDefault();
+    touchDragData={from:'slot',slotIdx,qtxt:state.slotContents[slotIdx]?.q};
+    const t=e.touches[0];
+    touchClone=card.cloneNode(true);
+    touchClone.style.cssText=`position:fixed;left:${t.clientX-60}px;top:${t.clientY-30}px;width:120px;z-index:999;opacity:0.85;pointer-events:none;`;
+    document.body.appendChild(touchClone);
+  },{passive:false});
+  card.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    const t=e.touches[0];
+    if(touchClone){touchClone.style.left=(t.clientX-60)+'px';touchClone.style.top=(t.clientY-30)+'px';}
+    document.querySelectorAll('.sort-slot').forEach(s=>{
+      const r=s.getBoundingClientRect();
+      if(t.clientX>=r.left&&t.clientX<=r.right&&t.clientY>=r.top&&t.clientY<=r.bottom) s.classList.add('drag-over');
+      else s.classList.remove('drag-over');
+    });
+  },{passive:false});
+  card.addEventListener('touchend',e=>{
+    const t=e.changedTouches[0];
+    if(touchClone){touchClone.remove();touchClone=null;}
+    document.querySelectorAll('.sort-slot').forEach(s=>s.classList.remove('drag-over'));
+    const slotsRow=document.getElementById('sort-slots-row');
+    const slots=slotsRow.querySelectorAll('.sort-slot');
+    slots.forEach((s,i)=>{
+      const r=s.getBoundingClientRect();
+      if(t.clientX>=r.left&&t.clientX<=r.right&&t.clientY>=r.top&&t.clientY<=r.bottom){
+        if(touchDragData&&touchDragData.from==='slot'){
+          const fromIdx=touchDragData.slotIdx;
+          const tmp=state.slotContents[fromIdx];
+          state.slotContents[fromIdx]=state.slotContents[i];
+          state.slotContents[i]=tmp;
+          refreshSortUI();
+        }
+      }
+    });
+    touchDragData=null;
+  });
+}
+
+function submitSort() {
+  const group=state.sortGroups[state.sortCurrentIdx];
+  const sorted=[...group].sort((a,b)=>getSortAns(a)-getSortAns(b));
+  const userOrder=state.slotContents.map(q=>q?.q||'');
+  const correctOrder=sorted.map(q=>q.q);
+  const isCorrect=JSON.stringify(userOrder)===JSON.stringify(correctOrder);
+
+  if(isCorrect){state.correctCount++;showFlash('correct');}
+  else{showFlash('wrong');}
+
+  const sortData={sorted, userOrder};
+  state.sortCurrentIdx++;
+  setTimeout(()=>showExplain(null,isCorrect?'correct':'wrong',null,sortData),400);
+}
+
+function confirmBackToTitle() {
+  clearInterval(state.timerInterval);
+  showScreen('screen-title');
+}
+// ━━━━━━━━━━━━━━━━━━━━━━
+//  初期化
+// ━━━━━━━━━━━━━━━━━━━━━━
+// 折りたたみ開閉
+function toggleCollapse(group) {
+  const wrap = document.getElementById('tags-wrap-' + group);
+  const arrow = document.getElementById('arrow-' + group);
+  const hint = document.getElementById('hint-' + group);
+  if(!wrap) return;
+  wrap.classList.toggle('collapsed');
+  const opened = !wrap.classList.contains('collapsed');
+  arrow.classList.toggle('open', opened);
+  if(hint){
+    hint.textContent = opened ? '▲ 閉じる' : 'タップで絞り込む';
+    hint.style.background = opened ? 'rgba(33,150,243,0.15)' : 'rgba(33,150,243,0.1)';
+    hint.style.color = opened ? 'var(--blue-dark)' : 'var(--blue)';
+  }
+}
+
+// デフォルトをsortモードに
+state.mode = 'sort';
+document.getElementById('life-card').style.display = 'none';
+updateCountDisplay();
+updateSubjectCards();
+</script>
+</body>
+</html>
