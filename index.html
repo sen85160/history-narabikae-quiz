@@ -420,17 +420,11 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </div>
 
 <!-- ══ タイトル ══ -->
-<div id="screen-title" class="screen active">
-  <div class="title-main">歴史並び替え</div>
-  <div class="title-sub">HISTORY DATE MASTER</div>
-  <button class="btn-start" onclick="gotoFilter()">はじめる</button>
-</div>
-
 <!-- ══ 条件画面 ══ -->
-<div id="screen-filter" class="screen">
+<div id="screen-filter" class="screen active">
   <div class="filter-layout">
     <div class="filter-topbar">
-      <button class="btn-secondary" onclick="showScreen('screen-title')" style="padding:6px 14px;font-size:12px;">← 戻る</button>
+      <button class="btn-secondary" onclick="location.reload()" style="padding:6px 14px;font-size:12px;">← 戻る</button>
       <div class="filter-topbar-title">出題条件を絞り込む</div>
     </div>
     <div class="filter-body">
@@ -701,7 +695,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
   <div class="result-btns">
     <button class="btn-primary" onclick="showScreen('screen-filter')">もう一度</button>
-    <button class="btn-secondary" onclick="showScreen('screen-title')" style="background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.4);color:#fff;">タイトルへ</button>
+    <button class="btn-secondary" onclick="showScreen('screen-filter')" style="background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.4);color:#fff;">タイトルへ</button>
   </div>
 </div>
 
@@ -717,7 +711,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   </div>
   <div class="result-btns">
     <button class="btn-primary" onclick="showScreen('screen-filter')">もう一度</button>
-    <button class="btn-secondary" onclick="showScreen('screen-title')" style="background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.4);color:#fff;">タイトルへ</button>
+    <button class="btn-secondary" onclick="showScreen('screen-filter')" style="background:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.4);color:#fff;">タイトルへ</button>
   </div>
 </div>
 
@@ -1534,7 +1528,7 @@ function submitSort() {
 
 function confirmBackToTitle() {
   clearInterval(state.timerInterval);
-  showScreen('screen-title');
+  showScreen('screen-filter');
 }
 // ━━━━━━━━━━━━━━━━━━━━━━
 //  初期化
